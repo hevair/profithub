@@ -2,7 +2,7 @@
 # Dockerfile - ProfitHub Backend
 # ============================================
 
-FROM node:20-alpine
+FROM node:20
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY backend/package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy prisma and generate client
+# Copy prisma and generate client (regenerate for Linux)
 COPY backend/prisma ./prisma
 RUN npx prisma generate
 
@@ -25,5 +25,5 @@ RUN npm run build
 # Expose port
 EXPOSE 4000
 
-# Start (correct path to main.js)
+# Start
 CMD ["node", "dist/src/main.js"]
