@@ -9,7 +9,7 @@ WORKDIR /app
 # Copy package files
 COPY backend/package*.json ./
 
-# Install dependencies (using install instead of ci for compatibility)
+# Install dependencies
 RUN npm install
 
 # Copy prisma and generate client
@@ -25,5 +25,5 @@ RUN npm run build
 # Expose port
 EXPOSE 4000
 
-# Start
-CMD ["node", "dist/main.js"]
+# Start (correct path to main.js)
+CMD ["node", "dist/src/main.js"]
