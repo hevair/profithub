@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  plan      String   @default("FREE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users    User[]
+  products Product[]
+  orders   Order[]
+  alerts   Alert[]
+  payments PaymentIntent[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  tenantId     String
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([email])
+}
+
+model Product {
+  id             String   @id @default(uuid())
+  tenantId       String
+  name           String
+  costPrice      Decimal  @db.Decimal(10, 2)
+  suggestedPrice Decimal? @db.Decimal(10, 2)
+  stock          Int      @default(0)
+  lowStockAlert  Int      @default(5)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id])
+  orders  Order[]
+
+  @@index([tenantId])
+}
+
+model Order {
+  id           String   @id @default(uuid())
+  tenantId     String
+  productId    String
+  platform     String
+  salePrice    Decimal  @db.Decimal(10, 2)
+  shippingCost Decimal  @db.Decimal(10, 2) @default(0)
+  fee          Decimal  @db.Decimal(10, 2) @default(0)
+  profit       Decimal  @db.Decimal(10, 2)
+  createdAt    DateTime @default(now())
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([tenantId])
+  @@index([productId])
+  @@index([createdAt])
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  tenantId  String
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([createdAt])
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+}
+
+model PlanConfig {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  price       Decimal  @db.Decimal(10, 2) @default(0)
+  maxProducts Int      @default(50)
+  maxOrders   Int      @default(100)
+  maxAlerts   Int      @default(10)
+  features    String   @default("")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  stripePriceId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PaymentIntent {
+  id               String   @id @default(uuid())
+  tenantId         String
+  planId           String
+  stripeSessionId  String   @unique
+  status           String   @default("pending")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([stripeSessionId])
+}

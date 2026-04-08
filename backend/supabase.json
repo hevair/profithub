@@ -1,0 +1,10 @@
+{
+  " studios": [
+    {
+      "type": "postgres",
+      "name": "profithub",
+      "region": "us-east-1",
+      " DATABASE_ URL": "postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+    }
+  ]
+}

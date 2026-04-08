@@ -1,0 +1,32 @@
+app = "profithub-api"
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  PORT = "8080"
+  NODE_ENV = "production"
+
+[deploy]
+  release_command = "npx prisma migrate deploy"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 8080
+
+  [[services.ports]]
+    handlers = ["tls", "http1"]
+    port = 443
+
+  [[services.http_checks]]
+    interval = 10000
+    timeout = 2000
+    path = "/api/health"
