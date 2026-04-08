@@ -12,9 +12,10 @@ COPY backend/package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy prisma and generate client (regenerate for Linux)
-COPY backend/prisma ./prisma
-RUN npx prisma generate
+# Clean old Prisma client and regenerate for Linux
+RUN rm -rf node_modules/.prisma && \
+    COPY backend/prisma ./prisma && \
+    RUN npx prisma generate
 
 # Copy source code
 COPY backend/ ./
