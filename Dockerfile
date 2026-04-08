@@ -9,8 +9,8 @@ WORKDIR /app
 # Copy package files
 COPY backend/package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (using install instead of ci for compatibility)
+RUN npm install
 
 # Copy prisma and generate client
 COPY backend/prisma ./prisma
